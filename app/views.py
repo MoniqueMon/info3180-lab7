@@ -7,10 +7,30 @@ This file creates your application.
 
 from app import app
 from flask import render_template, request
+from forms import UploadForm
+from werkzeug.utils import secure_filename
+import flash.display
+import flash.events
+import jsonify
+
+
 
 ###
 # Routing for your application.
 ###
+
+@app.route('/api/upload', methods=['POST'])
+def upload():
+    uploadfile = UploadForm()
+    if uploadfile.validae_on_submit():
+        dsc = uploadfile.dscp.data
+        fl = uploadfile.iamg.data
+        fname = secure_filename(fl.filename)
+        fl.save(app.config['UPLOAD_FOLDER']+fname)
+        flash('File Saved', 'success')
+        return jsonify({"message":"File Upload Successful", "filename":fname, "description":dsc})
+    else: 
+        return jsonify({"errors": form_errors(uploadfile)})
 
 
 @app.route('/')
